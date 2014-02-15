@@ -1,6 +1,6 @@
 # SimpleMidiInput.js
 
-Abstraction over the MIDI input. Does all the byte crunching and exposes a straightforward event system.
+Abstraction over the MIDI input. Does all the byte crunching and exposes a straightforward event API.
 
 # How to use
 
@@ -66,7 +66,7 @@ You can always catch all the events and log them for debugging. Filtering the MI
 
 # Notes
 
- * Some controllers and MIDI apps send a [noteOn events with a velocity of 0][3] instead of noteOff events. But no worry, SMI automatically translates them to noteOff events.
+ * Some controllers and MIDI apps send a [noteOn events with a velocity of 0][3] instead of noteOff events. But no worries, SMI automatically translates them to noteOff events.
  * Tested with MPK Mini, HotHand USB and half a dozen iOS apps with rtpMIDI.
 
 
