@@ -136,7 +136,7 @@ var SimpleMidiInput = (function () {
 		}
 
 		if(this.filter) {
-			if(!this.filter(event) {
+			if(!this.filter(event)) {
 				return this;
 			}
 		}
@@ -158,7 +158,7 @@ var SimpleMidiInput = (function () {
 
 	/**
 	 * Add a filter
-	 * @param (Function) [filter] - Filter function
+	 * @param {Function} [filter] - Filter function
 	 * @returns {SimpleMidiInput} Instance for method chaining
 	 */
 	SimpleMidiInput.prototype.setFilter = function (filter) {
@@ -169,7 +169,7 @@ var SimpleMidiInput = (function () {
 		}
 
 		return this;
-	}
+	};
 
 	/**
 	 * Subscribe to an event
