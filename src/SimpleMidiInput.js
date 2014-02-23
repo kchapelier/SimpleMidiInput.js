@@ -9,12 +9,9 @@ var SimpleMidiInput = (function () {
 		this.events = {};
 
 		midiInput.addEventListener("midimessage", function (event) {
-			var data = event.data;
-			this.treatEvent(data);
+			this.treatEvent(event.data);
 		}.bind(this));
 	};
-
-	
 
 	/**
 	 * Treat an incoming midi message and trigger the matching event
@@ -23,18 +20,12 @@ var SimpleMidiInput = (function () {
 	 * @returns {SimpleMidiInput} Instance for method chaining
 	 */
 	SimpleMidiInput.prototype.treatEvent = function (data) {
-		var
-			byte1 = data[0],
-			byte2 = data[1],
-			byte3 = data[2],
-			event;
+		var event;
 
-		//some iOS app are sending a massive amount of seemingly empty messages, ignore them
-		if(byte1 === 0) {
-			return this;
-		}
-
-		switch(byte1) {
+		switch(data[0]) {
+			case 0x00:
+				//some iOS app are sending a massive amount of seemingly empty messages, ignore them
+				return this;
 			case 0xF8:
 				event = {
 					'event': 'clock',
@@ -73,42 +64,42 @@ var SimpleMidiInput = (function () {
 
 		//TODO add pitch wheel support
 
-		if (byte1 >= 0xD0 && byte1 < 0xE0) {
+		if (data[0] >= 0xD0 && data[0] < 0xE0) {
 			event = {
 				'event': 'channelAftertouch',
-				'channel': 1 + byte1 - 0xD0,
-				'pressure': byte2,
+				'channel': 1 + data[0] - 0xD0,
+				'pressure': data[1],
 				'data': data
 			};
-		} else if (byte1 >= 0xC0 && byte1 < 0xD0) {
+		} else if (data[0] >= 0xC0 && data[0] < 0xD0) {
 			event = {
 				'event': 'programChange',
-				'channel': 1 + byte1 - 0xC0,
-				'program': byte2,
+				'channel': 1 + data[0] - 0xC0,
+				'program': data[1],
 				'data': data
 			};
-		} else if (byte1 >= 0xB0 && byte1 < 0xC0) {
+		} else if (data[0] >= 0xB0 && data[0] < 0xC0) {
 			event = {
 				'event': 'cc',
-				'channel': 1 + byte1 - 0xB0,
-				'cc': byte2,
-				'value': byte3,
+				'channel': 1 + data[0] - 0xB0,
+				'cc': data[1],
+				'value': data[2],
 				'data': data
 			};
-		} else if (byte1 >= 0xA0 && byte1 < 0xB0) {
+		} else if (data[0] >= 0xA0 && data[0] < 0xB0) {
 			event = {
 				'event': 'polyphonicAftertouch',
-				'channel': 1 + byte1 - 0xA0,
-				'key': byte2,
-				'pressure': byte3,
+				'channel': 1 + data[0] - 0xA0,
+				'key': data[1],
+				'pressure': data[2],
 				'data': data
 			};
-		} else if (byte1 >= 0x90 && byte1 < 0xA0) {
+		} else if (data[0] >= 0x90 && data[0] < 0xA0) {
 			event = {
 				'event': 'noteOn',
-				'channel': 1 + byte1 - 0x90,
-				'key': byte2,
-				'velocity': byte3,
+				'channel': 1 + data[0] - 0x90,
+				'key': data[1],
+				'velocity': data[2],
 				'data': data
 			};
 
@@ -118,12 +109,12 @@ var SimpleMidiInput = (function () {
 				event.event = 'noteOff';
 			}
 
-		} else if (byte1 >= 0x80 && byte1 < 0x90) {
+		} else if (data[0] >= 0x80 && data[0] < 0x90) {
 			event = {
 				'event': 'noteOff',
-				'channel': 1 + byte1 - 0x80,
-				'key': byte2,
-				'velocity': byte3,
+				'channel': 1 + data[0] - 0x80,
+				'key': data[1],
+				'velocity': data[2],
 				'data': data
 			};
 		}
@@ -141,17 +132,17 @@ var SimpleMidiInput = (function () {
 			}
 		}
 
-		if (event) {
-			if (!!event['cc']) {
-				this.trigger(event.event + event.cc, event);
-				this.trigger('ch' + event.channel + '.' + event.event + event.cc, event);
-			} else {
-				this.trigger(event.event, event);
-				this.trigger('ch' + event.channel + '.' + event.event, event);
+		if (!!event['cc']) {
+			this.trigger(event.event + event.cc, event);
+			this.trigger(event.channel + '.' + event.event + event.cc, event);
+		} else {
+			this.trigger(event.event, event);
+			if(!!event['channel']) {
+				this.trigger(event.channel + '.' + event.event, event);
 			}
-			
-			this.trigger('global', event);
 		}
+
+		this.trigger('global', event);
 
 		return this;
 	};
@@ -182,7 +173,7 @@ var SimpleMidiInput = (function () {
 		if (typeof(channel) === 'function') {
 			func = channel;
 		} else if (isNumeric(channel)) {
-			event = 'ch' + channel + '.' + event;
+			event = channel + '.' + event;
 		}
 
 		if (!this.events[event]) {
@@ -205,7 +196,7 @@ var SimpleMidiInput = (function () {
 		if (typeof(channel) === 'function') {
 			func = channel;
 		} else if (isNumeric(channel)) {
-			event = 'ch' + channel + '.' + event;
+			event = channel + '.' + event;
 		}
 
 		if (!func) {
