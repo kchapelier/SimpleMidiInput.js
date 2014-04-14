@@ -64,11 +64,22 @@ smi.on('global', function(data) {
 
 You can always catch all the events and log them for debugging. Filtering the MIDI clock events is probably a good idea though.
 
+# History
+
+## 1.0.0 (2014/04/14) :
+
+ * Add pitchWheel, songPosition, songSelect, tuneRequest and activeSensing support.
+ * Publish on bower.
+ * Declares the public API stable.
+
+## 0.1.0 (~ 2014/02/23)
+
 # Notes
 
  * Some controllers and MIDI apps send a [noteOn events with a velocity of 0][3] instead of noteOff events. But no worries, SMI automatically translates them to noteOff events.
- * Tested with MPK Mini, HotHand USB and half a dozen iOS apps with rtpMIDI.
-
+ * Tested with MPK Mini, HotHand USB and half a dozen iOS apps with rtpMIDI / CoreMIDI.
+ * Tested on both the Jazz-plugin polyfill and the MIDI API.
+ * No Sysex support yet.
 
   [1]: http://cwilso.github.io/WebMIDIAPIShim/
   [2]: http://www.midi.org/techspecs/midimessages.php#3
