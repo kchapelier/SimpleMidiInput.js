@@ -300,14 +300,12 @@
     };
 
     if (typeof define === 'function' && define.amd) {
-        define(function () {
+        define(function() {
             return SimpleMidiInput;
         });
     } else if(typeof module === 'object') {
         module.exports = SimpleMidiInput;
-    } else {
-        if (typeof window === "object" && typeof window.document === "object") {
-            window.SimpleMidiInput = SimpleMidiInput;
-        }
+    } else if (typeof window === "object" && typeof window.document === "object") {
+        window.SimpleMidiInput = SimpleMidiInput;
     }
 })();

@@ -2,15 +2,33 @@
 
 Abstraction over the MIDI input. Does all the byte crunching and exposes a straightforward event API.
 
-# How to use
+## Installing and testing
+
+Download the SimpleMidiInput.js file and include it in your html page.
+
+Or install it with bower using the following command: ```bower install SimpleMidiInput.js```
+
+To run the test suite, run the following command: ```npm test```
+
+After installing the dev dependencies with ```npm install```
+
+## How to use
 
 Include the [Jazz-plugin polyfill][1], instanciate it and get the desired midi input.
 
 ```js
-var smi = new SimpleMidiInput(input);
+navigator.requestMIDIAccess().then( onsuccesscallback, onerrorcallback );
+
+var onsuccesscallback = function(midi) {
+    var smi = new SimpleMidiInput(midi.inputs()[0]);
+};
+
+var onerrorcallback = function(err) {
+    console.log('ERROR : ' + err.code);
+};
 ```
 
-Here we instanciate SimpleMidiInput as a wrapper for the midi input.
+Here we instanciate SimpleMidiInput as a wrapper for the first midi input.
 
 ```js
 smi.on('noteOn', function(data) {
@@ -64,17 +82,23 @@ smi.on('global', function(data) {
 
 You can always catch all the events and log them for debugging. Filtering the MIDI clock events is probably a good idea though.
 
-# History
+## History
 
-## 1.0.0 (2014/04/14) :
+### 1.0.1 (2014/04/15) :
+
+ * Add missing channel information to picthWheel event.
+ * Make the script AMD and CommonJS compliant.
+ * Add a few mocha tests on the parsing of midi message.
+
+### 1.0.0 (2014/04/14) :
 
  * Add pitchWheel, songPosition, songSelect, tuneRequest and activeSensing support.
  * Publish on bower.
  * Declares the public API stable.
 
-## 0.1.0 (~ 2014/02/23)
+### 0.1.0 (~ 2014/02/23)
 
-# Notes
+## Notes
 
  * Some controllers and MIDI apps send a [noteOn events with a velocity of 0][3] instead of noteOff events. But no worries, SMI automatically translates them to noteOff events.
  * Tested with MPK Mini, HotHand USB and half a dozen iOS apps with rtpMIDI / CoreMIDI.
