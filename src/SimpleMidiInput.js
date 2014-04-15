@@ -1,4 +1,11 @@
-var SimpleMidiInput = (function () {
+/*
+ * SimpleMidiInput.js
+ * v1.0.1
+ * Author: Kevin Chapelier
+ * License: MIT
+ */
+
+(function () {
     "use strict";
 
     /**
@@ -111,7 +118,8 @@ var SimpleMidiInput = (function () {
         if (data[0] >= 0xE0 && data[0] < 0xF0) {
             event = {
                 'event': 'pitchWheel',
-                'value': readVLQ(data[1], data[2]) - 0x2000, //variable length quantity
+                'channel': 1 + data[0] - 0xE0,
+                'value': readVLQ(data[1], data[2]) - 0x2000,
                 'data': data
             };
         } else if (data[0] >= 0xD0 && data[0] < 0xE0) {
@@ -277,5 +285,13 @@ var SimpleMidiInput = (function () {
         return this;
     };
 
-    return SimpleMidiInput;
+    if (typeof define === 'function' && define.amd) {
+        define(function() {
+            return SimpleMidiInput;
+        });
+    } else {
+        if (typeof window === "object" && typeof window.document === "object") {
+            window.SimpleMidiInput = SimpleMidiInput;
+        }
+    }
 })();
