@@ -36,23 +36,23 @@
         this.events = {};
 
         midiInput.addEventListener("midimessage", function (event) {
-            this.treatEvent(event.data);
+            this.processMidiMessage(event.data);
         }.bind(this));
     };
 
     /**
-     * Treat an incoming midi message and trigger the matching event
+     * Parse an incoming midi message
      * @private
      * @param {UInt8Array} data - Midi mesage data
-     * @returns {SimpleMidiInput} Instance for method chaining
+     * @returns {Object} Midi event, as a readable object
      */
-    SimpleMidiInput.prototype.treatEvent = function (data) {
+    SimpleMidiInput.prototype.parseMidiMessage = function(data) {
         var event;
 
         switch(data[0]) {
             case 0x00:
                 //some iOS app are sending a massive amount of seemingly empty messages, ignore them
-                return this;
+                return null;
             case 0xF2:
                 event = {
                     'event': 'songPosition',
@@ -184,23 +184,37 @@
             };
         }
 
-        if(this.filter) {
-            if(!this.filter(event)) {
-                return this;
-            }
-        }
+        return event;
+    };
 
-        if (!!event['cc']) {
-            this.trigger(event.event + event.cc, event);
-            this.trigger(event.channel + '.' + event.event + event.cc, event);
-        } else {
-            this.trigger(event.event, event);
-            if(!!event['channel']) {
-                this.trigger(event.channel + '.' + event.event, event);
-            }
-        }
+    /**
+     * Process an incoming midi message and trigger the matching event
+     * @private
+     * @param {UInt8Array} data - Midi mesage data
+     * @returns {SimpleMidiInput} Instance for method chaining
+     */
+    SimpleMidiInput.prototype.processMidiMessage = function (data) {
+        var event = this.parseMidiMessage(data);
 
-        this.trigger('global', event);
+        if(event) {
+            if (this.filter) {
+                if (!this.filter(event)) {
+                    return this;
+                }
+            }
+
+            if (!!event['cc']) {
+                this.trigger(event.event + event.cc, event);
+                this.trigger(event.channel + '.' + event.event + event.cc, event);
+            } else {
+                this.trigger(event.event, event);
+                if (!!event['channel']) {
+                    this.trigger(event.channel + '.' + event.event, event);
+                }
+            }
+
+            this.trigger('global', event);
+        }
 
         return this;
     };
@@ -286,9 +300,11 @@
     };
 
     if (typeof define === 'function' && define.amd) {
-        define(function() {
+        define(function () {
             return SimpleMidiInput;
         });
+    } else if(typeof module === 'object') {
+        module.exports = SimpleMidiInput;
     } else {
         if (typeof window === "object" && typeof window.document === "object") {
             window.SimpleMidiInput = SimpleMidiInput;
