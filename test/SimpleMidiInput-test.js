@@ -1,18 +1,13 @@
 "use strict";
 
-var should = require('chai').should();
+require('chai').should();
 var SimpleMidiInput = require('../src/SimpleMidiInput.js');
 
 describe('SimpleMidiInput', function() {
-    //fake midi input
-    var midiInput = {
-        addEventListener : function() {}
-    };
-
     describe('#treatEvent()', function() {
         it('supports noteOff events', function() {
             var event,
-                smi = new SimpleMidiInput(midiInput);
+                smi = new SimpleMidiInput();
 
             event = smi.parseMidiMessage([0x80, 0x40, 0x7F]);
             event.event.should.equal('noteOff');
@@ -35,7 +30,7 @@ describe('SimpleMidiInput', function() {
 
         it('supports noteOn events', function() {
             var event,
-                smi = new SimpleMidiInput(midiInput);
+                smi = new SimpleMidiInput();
 
             event = smi.parseMidiMessage([0x90, 0x40, 0x7F]);
             event.event.should.equal('noteOn');
@@ -58,7 +53,7 @@ describe('SimpleMidiInput', function() {
 
         it('supports noteOn with velocity 0 as noteOff', function() {
             var event,
-                smi = new SimpleMidiInput(midiInput);
+                smi = new SimpleMidiInput();
 
             event = smi.parseMidiMessage([0x90, 0x40, 0x00]);
             event.event.should.equal('noteOff');
@@ -81,7 +76,7 @@ describe('SimpleMidiInput', function() {
         
         it('supports polyphonicAftertouch events', function() {
             var event,
-                smi = new SimpleMidiInput(midiInput);
+                smi = new SimpleMidiInput();
             
             event = smi.parseMidiMessage([0xA0, 0x40, 0x7F]);
             event.event.should.equal('polyphonicAftertouch');
@@ -104,7 +99,7 @@ describe('SimpleMidiInput', function() {
 
         it('supports cc events', function() {
             var event,
-                smi = new SimpleMidiInput(midiInput);
+                smi = new SimpleMidiInput();
 
             event = smi.parseMidiMessage([0xB0, 0x40, 0x7F]);
             event.event.should.equal('cc');
@@ -127,7 +122,7 @@ describe('SimpleMidiInput', function() {
 
         it('supports programChange events', function() {
             var event,
-                smi = new SimpleMidiInput(midiInput);
+                smi = new SimpleMidiInput();
 
             event = smi.parseMidiMessage([0xC0, 0x40]);
             event.event.should.equal('programChange');
@@ -147,7 +142,7 @@ describe('SimpleMidiInput', function() {
         
         it('supports channelAftertouch events', function() {
             var event,
-                smi = new SimpleMidiInput(midiInput);
+                smi = new SimpleMidiInput();
 
             event = smi.parseMidiMessage([0xD0, 0x40]);
             event.event.should.equal('channelAftertouch');
@@ -167,7 +162,7 @@ describe('SimpleMidiInput', function() {
 
         it('supports pitchWheel events', function() {
             var event,
-                smi = new SimpleMidiInput(midiInput);
+                smi = new SimpleMidiInput();
 
             event = smi.parseMidiMessage([0xE0, 0x00, 0x00]);
             event.event.should.equal('pitchWheel');
@@ -187,7 +182,7 @@ describe('SimpleMidiInput', function() {
 
         it('supports clocks events', function() {
             var event,
-                smi = new SimpleMidiInput(midiInput);
+                smi = new SimpleMidiInput();
 
             event = smi.parseMidiMessage([0xF8]);
             event.event.should.equal('clock');
@@ -208,7 +203,7 @@ describe('SimpleMidiInput', function() {
 
         it('supports other 0xF* events', function() {
             var event,
-                smi = new SimpleMidiInput(midiInput);
+                smi = new SimpleMidiInput();
 
             event = smi.parseMidiMessage([0xF2, 0x7F, 0x7F]);
             event.event.should.equal('songPosition');
