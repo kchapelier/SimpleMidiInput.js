@@ -12,15 +12,17 @@ To run the test suite, run the following command: ```npm test```
 
 After installing the dev dependencies with ```npm install```
 
-## How to use
+## Usage
 
-Include the [Jazz-plugin polyfill][1], instanciate it and get the desired midi input.
+Either include the [Jazz-plugin polyfill][1] and instanciate it or run chrome on mac with the Web MIDI API enabled in
+chrome://flags, then get the desired midi input.
 
 ```js
+var smi = new SimpleMidiInput();
 navigator.requestMIDIAccess().then( onsuccesscallback, onerrorcallback );
 
 var onsuccesscallback = function(midi) {
-    var smi = new SimpleMidiInput(midi.inputs()[0]);
+    smi.attach(midi.inputs());
 };
 
 var onerrorcallback = function(err) {
@@ -28,7 +30,7 @@ var onerrorcallback = function(err) {
 };
 ```
 
-Here we instanciate SimpleMidiInput as a wrapper for the first midi input.
+Here we instanciate SimpleMidiInput and attach it to all the MIDI inputs.
 
 ```js
 smi.on('noteOn', function(data) {
@@ -82,11 +84,139 @@ smi.on('global', function(data) {
 
 You can always catch all the events and log them for debugging. Filtering the MIDI clock events is probably a good idea though.
 
+## API reference
+
+### new SimpleMidiInput([midiInput]);
+
+Instaciation of the class.
+
+Options :
+
+ * midiInput : A single instance of MIDIInput or an array of MIDIInput
+
+### smi.attach(midiInput);
+
+Attach the instance to one or several MIDIInput.
+
+Options :
+
+ * midiInput : A single instance of MIDIInput or an array of MIDIInput
+
+### smi.detach(midiInput);
+
+Detach the instance from one or several MIDIInput.
+
+Options :
+
+* midiInput : A single instance of MIDIInput or an array of MIDIInput
+
+### smi.detachAll();
+
+Detach the instance from all MIDIInputs.
+
+### smi.on(event, channel, handler);
+### smi.on(event, handler);
+
+Subscribe to an event.
+
+Options :
+
+ * event : Name of the event to listen to (ie: noteOn, noteOff, ...)
+ * channel : Number of the midi channel to listen to (from 1 to 16)
+ * handler : Handler function
+
+Example:
+
+```js
+var func = function(event) {
+    console.log(event);
+};
+
+smi.on('noteOn', func); // add an event on noteOn for the all channels
+smi.on('noteOn', 1, func); // add an event on noteOn for the first channel
+```
+
+### smi.off(event, channel, [handler]);
+### smi.off(event, [handler]);
+
+Unsubscribe to an event.
+
+Options :
+
+ * event : Name of the event to listen to (ie: noteOn, noteOff, ...)
+ * channel : Number of the midi channel to listen to (from 1 to 16)
+ * handler : Handler function
+
+Example :
+
+```js
+smi.off('noteOff'); // remove any events on noteOff from all channels
+smi.off('noteOff', 1); // remove any events on noteOff from the first channel
+smi.off('noteOff', func); // remove a specific event on noteOff from all channels
+smi.off('noteOff', 1, func); // remove a specific event on noteOff from the first channel
+```
+
+### smi.trigger(event, args);
+
+Artificially triggers one of the event.
+
+Options :
+
+ * event : Name of the event to listen to (ie: noteOn, noteOff, ...)
+ * args : Arguments to pass to the handler function
+
+### smi.setFilter(filter);
+
+Set a function to filter the midi event, the function will get the event as argument and must return false to filter it out.
+There can only be one filter function at a time, passing null removes the current function.
+
+Options :
+
+ * filter : Filtering function.
+
+Example :
+
+```js
+smi.trigger(function(event) {
+    // we don't want any of the noteOn / noteOff events for notes above E4
+    if((event.event === 'noteOn' || event.event === 'noteOff') && event.key > 64) {
+        return false;
+    }
+});
+```
+
+```js
+smi.trigger(null); //remove the current function
+```
+
+### Event names with their related values
+
+ * noteOn (channel, key, velocity)
+ * noteOff (channel, key, velocity)
+ * cc(x) (channel, cc, value)
+ * channelAftertouch (channel, pressure)
+ * polyphonicAftertouch (channel, key, pressure)
+ * pitchWheel (channel, value)
+ * programChange (channel, program)
+ * clock (command)
+ * songPosition
+ * songSelect
+ * tuneRequest
+ * activeSensing
+ * reset
+ * global (catches everything)
+
 ## History
+
+### 1.0.2 (2014/07/19)
+
+ * A single instance can now be bound to many MIDI Inputs.
+ * Add attach(), detach() and detachAll() methods to change the MIDI inputs bound to the instance.
+ * Add proper API reference to the readme.
 
 ### 1.0.1 (2014/04/15) :
 
- * Add missing channel information to picthWheel event.
+ * Add missing channel information to pitchWheel event.
  * Make the script AMD and CommonJS compliant.
  * Add a few mocha tests on the parsing of midi message.
 
