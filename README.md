@@ -1,5 +1,7 @@
 # SimpleMidiInput.js
 
+[![Build Status](https://travis-ci.org/kchapelier/SimpleMidiInput.js.svg?branch=master)](https://travis-ci.org/kchapelier/SimpleMidiInput.js)
+
 Abstraction over the MIDI input. Does all the byte crunching and exposes a straightforward event API.
 
 ## Installing and testing
