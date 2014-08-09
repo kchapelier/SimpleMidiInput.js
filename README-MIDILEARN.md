@@ -22,7 +22,7 @@ Options :
  * id : A unique id for the parameter, can be any arbitrary string or number
  * min : The minimum value of the parameter (will default to 0)
  * max : The maximum value of the parameter (mandatory)
- * value : The current value of the paramter
+ * value : The current value of the parameter
  * events : An object containing the different events bound to the parameter
 
 Events :
@@ -67,6 +67,8 @@ var change = function(value) {
     console.log('parameter change:', value);
 };
 
+/** HERE STARTS THE ACTUAL CODE RELATED TO MIDI LEARN **/
+
 // we can set up the midi learning before smi is actually attached to a MIDIInput
 var midiLearning = smi.getMidiLearning({
     id : input.id,
@@ -94,15 +96,17 @@ var midiLearning = smi.getMidiLearning({
     }
 });
 
-// start listening to midi events to bind the parameter to when clicking on the 'learn' link
-learn.addEventListener('click', function() {
+// start listening to midi events to bind the parameter to when clicking on 'learn'
+learnButton.addEventListener('click', function() {
     midiLearning.startListening();
 });
 
-// clear the midi bindings (and cancel the listener) when clicking on the 'clear' link
-clear.addEventListener('click', function() {
+// clear the midi bindings (and cancel the listener) when clicking on 'clear'
+clearButton.addEventListener('click', function() {
     midiLearning.unbind();
 });
+
+/** HERE ENDS THE ACTUAL CODE RELATED TO MIDI LEARN **/
 
 // make so direct changes to the input also affects the parameters
 input.addEventListener('change', function() {
