@@ -1,17 +1,32 @@
-var scale = function(value, min, max, dstMin, dstMax) {
-    "use strict";
+"use strict";
 
+var scale = function scale(value, min, max, dstMin, dstMax) {
     value = (max === min ? 0 : (Math.max(min, Math.min(max, value)) / (max - min)));
 
     return value * (dstMax - dstMin) + dstMin;
 };
 
+var limit = function limit(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+};
+
+/**
+ * Generate a random id
+ * @returns {Number}
+ */
+var generateRandomId = function() {
+    return (new Date()).getTime() + Math.floor(Math.random() * 1000000);
+};
+
 var MidiLearning = function(midiLearn, options) {
     this.midiLearn = midiLearn;
 
-    this.id = options.id || (new Date()).getTime() + Math.floor(Math.random() * 10000);
+    this.id = options.id || generateRandomId();
     this.min = parseFloat(options.min || 0);
     this.max = parseFloat(options.max);
+    this.channel = null;
+    this.activeCallbacks = {};
+
     this.events = {
         change : options.events.change || function() {},
         bind : options.events.bind || function() {},
@@ -20,20 +35,44 @@ var MidiLearning = function(midiLearn, options) {
         listen : options.events.listen || function() {}
     };
 
-    this.channel = null;
-    this.activeCallbacks = {};
+    this.setValue(limit(parseFloat(options.value || 0), this.min, this.max));
 };
 
+MidiLearning.prototype.id = null;
+MidiLearning.prototype.min = null;
+MidiLearning.prototype.max = null;
+MidiLearning.prototype.value = null;
+MidiLearning.prototype.channel = null;
+MidiLearning.prototype.activeCallbacks = null;
+MidiLearning.prototype.events = null;
+
 MidiLearning.prototype.unbind = function() {
-    this.midilearn.removeBinding(this);
+    this.midiLearn.removeBinding(this);
 };
 
 MidiLearning.prototype.startListening = function() {
-    this.midilearn.startListeningForBinding(this);
+    this.midiLearn.startListeningForBinding(this);
 };
 
 MidiLearning.prototype.stopListening = function() {
-    this.midilearn.startListeningForBinding(this);
+    this.midiLearn.startListeningForBinding(this);
+};
+
+MidiLearning.prototype.setValue = function(event, property) {
+    var value;
+
+    if(event && property) {
+        value = scale(event[property], 0, 127, this.min, this.max);
+    } else if(typeof event === 'number') {
+        value = event;
+    } else {
+        value = this.min;
+    }
+
+    if(value !== this.value) {
+        this.value = value;
+        this.events.change(this.id, value);
+    }
 };
 
 var MidiLearn = function(smi) {
@@ -45,14 +84,14 @@ MidiLearn.prototype.smi = null;
 MidiLearn.prototype.currentMidiLearning = null;
 MidiLearn.prototype.bindings = null;
 
-MidiLearn.prototype.listenerForBinding = function(event) {
-    console.log('listenerForBinding');
-    console.log(arguments);
+MidiLearn.prototype.getMidiLearning = function(options) {
+    return new MidiLearning(this, options);
+};
 
+MidiLearn.prototype.listenerForBinding = function(event) {
     if(this.currentMidiLearning && event) {
         var midiLearning = this.currentMidiLearning;
 
-        console.log(midiLearning);
         midiLearning.events.bind(event);
 
         this.stopListeningForBinding();
@@ -62,59 +101,49 @@ MidiLearn.prototype.listenerForBinding = function(event) {
 };
 
 MidiLearn.prototype.startListeningForBinding = function(midiLearning) {
-    console.log('startListeningForBinding');
-    console.log(arguments);
-
     this.stopListeningForBinding();
     this.currentMidiLearning = midiLearning;
 
     midiLearning.listener = this.listenerForBinding.bind(this);
 
-    console.log(midiLearning);
     midiLearning.events.listen(midiLearning);
 
     this.smi.on('global', midiLearning.listener);
 };
 
 MidiLearn.prototype.stopListeningForBinding = function(midiLearning) {
-    console.log('stopListeningForBinding');
-    console.log(arguments);
-
     if(this.currentMidiLearning !== null && (!midiLearning || this.currentMidiLearning === midiLearning)) {
         this.smi.off('global', this.currentMidiLearning.listener);
-
         this.currentMidiLearning.events.cancel();
-
         this.currentMidiLearning = null;
     }
 };
 
-MidiLearn.prototype.removeBinding = function(id) {
-    console.log('removeBinding');
-    console.log(arguments);
+MidiLearn.prototype.setCallback = function(midiLearning, eventName, func) {
+    midiLearning.activeCallbacks[eventName] = func;
+    this.smi.on(eventName, midiLearning.channel, func);
+};
 
-    //TODO remove the events
-
-    if(this.bindings[id] && this.bindings[id].activeCallbacks) {
-        var callbacks = this.bindings[id].activeCallbacks;
+MidiLearn.prototype.removeBinding = function(midiLearning) {
+    if(midiLearning && midiLearning.activeCallbacks) {
+        var callbacks = midiLearning.activeCallbacks;
 
         for(var key in callbacks) {
-            this.smi.off(key, this.bindings[id].channel, callbacks[key]);
+            if(callbacks.hasOwnProperty(key)) {
+                this.smi.off(key, midiLearning.channel, callbacks[key]);
+            }
         }
+
+        midiLearning.activeCallbacks = {};
     }
 
-    delete this.bindings[id];
+    delete this.bindings[midiLearning.id];
 };
 
 MidiLearn.prototype.addBinding = function(midiLearning, event) {
-    console.log('addBinding');
-    console.log(arguments);
-
-    this.removeBinding(midiLearning.id);
-    midiLearning.activeCallbacks = {};
+    this.removeBinding(midiLearning);
 
     this.bindings[midiLearning.id] = midiLearning;
-
 
     if(event.event === 'cc') {
         this.addCCBinding(midiLearning, event);
@@ -124,45 +153,31 @@ MidiLearn.prototype.addBinding = function(midiLearning, event) {
 };
 
 MidiLearn.prototype.addNoteBinding = function(midiLearning, event) {
-    console.log('addNoteBinding');
-    console.log(arguments);
-
     midiLearning.channel = event.channel;
-    var callbacks = midiLearning.activeCallbacks;
 
-    callbacks['noteOn'] = function(e) {
+    this.setCallback(midiLearning, 'noteOn', function(e) {
         if(e.key === event.key) {
-            midiLearning.events.change(midiLearning.id, scale(e.velocity, 0, 127, midiLearning.min, midiLearning.max));
+            midiLearning.setValue(e, 'velocity');
         }
-    };
+    });
 
-    callbacks['noteOff'] = function(e) {
+    this.setCallback(midiLearning, 'noteOff', function(e) {
         if(e.key === event.key) {
-            midiLearning.events.change(midiLearning.id, midiLearning.min);
+            midiLearning.setValue();
         }
-    };
+    });
 
-    callbacks['polyphonicAftertouch'] = function(e) {
+    this.setCallback(midiLearning, 'polyphonicAftertouch', function(e) {
         if(e.key === event.key) {
-            midiLearning.events.change(midiLearning.id, scale(e.pressure, 0, 127, midiLearning.min, midiLearning.max));
+            midiLearning.setValue(e, 'pressure');
         }
-    };
-
-    this.smi.on('noteOn', event.channel, callbacks.noteOn);
-    this.smi.on('noteOff', event.channel, callbacks.noteOff);
-    this.smi.on('polyphonicAftertouch', event.channel, callbacks.polyphonicAftertouch);
+    });
 };
 
 MidiLearn.prototype.addCCBinding = function(midiLearning, event) {
-    console.log('addCCBinding');
-    console.log(arguments);
-
     midiLearning.channel = event.channel;
-    var callbacks = midiLearning.activeCallbacks;
 
-    callbacks['cc' + event.cc] = function(e) {
-        midiLearning.events.change(midiLearning.id, scale(e.value, 0, 127, midiLearning.min, midiLearning.max));
-    };
-
-    this.smi.on('cc' + event.cc, event.channel, callbacks['cc' + event.cc]);
+    this.setCallback(midiLearning, 'cc' + event.cc, function(e) {
+        midiLearning.setValue(e, 'value');
+    });
 };

@@ -1,6 +1,6 @@
 /*
  * SimpleMidiInput.js
- * v1.0.2
+ * v1.1.0
  * Author: Kevin Chapelier
  * License: MIT
  */
@@ -380,6 +380,28 @@
         }
 
         return this;
+    };
+
+    /**
+     * Return an instance of the MidiLearn handling class
+     * @private
+     * @returns {MidiLearn} Instance of MidiLearn
+     */
+    SimpleMidiInput.prototype.getMidiLearnInstance = function() {
+        if(!this.midiLearn) {
+            this.midiLearn = new MidiLearn(this);
+        }
+
+        return this.midiLearn;
+    };
+
+    /**
+     * Return an instance of MidiLearning for a given parameter
+     * @param {Object} options - Options of the parameter (id, min, max, value, events)
+     * @returns {MidiLearning}
+     */
+    SimpleMidiInput.prototype.getMidiLearning = function(options) {
+        return this.getMidiLearnInstance().getMidiLearning(options);
     };
 
     if (typeof define === 'function' && define.amd) {
