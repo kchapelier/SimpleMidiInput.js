@@ -86,6 +86,14 @@ smi.on('global', function(data) {
 
 You can always catch all the events and log them for debugging. Filtering the MIDI clock events is probably a good idea though.
 
+# MIDI learn
+
+MIDI Learn is a simple system used by many DAW and plugins to simplify the use of MIDI controllers.
+For web apps, the main advantage is that the MIDI binding doesn't have to be hardcoded.
+The users can effectively bind the parameters to the CC of their choice.
+
+Check this [specific documentation](https://github.com/kchapelier/SimpleMidiInput.js/blob/master/README-MIDILEARN.md).
+
 ## API reference
 
 ### new SimpleMidiInput([midiInput]);
@@ -191,7 +199,7 @@ smi.trigger(function(event) {
 smi.trigger(null); //remove the current function
 ```
 
-### Event names with their related values
+### Event names with their relative values
 
  * noteOn (channel, key, velocity)
  * noteOff (channel, key, velocity)
@@ -210,7 +218,11 @@ smi.trigger(null); //remove the current function
 
 ## History
 
-### 1.0.2 (2014/07/19)
+### 1.1.0 (2014/08/10) :
+
+ * Add experimental MIDI learn capability ([doc]((https://github.com/kchapelier/SimpleMidiInput.js/blob/master/README-MIDILEARN.md))).
+
+### 1.0.2 (2014/07/19) :
 
  * A single instance can now be bound to many MIDI Inputs.
  * Add attach(), detach() and detachAll() methods to change the MIDI inputs bound to the instance.
@@ -232,7 +244,7 @@ smi.trigger(null); //remove the current function
 
 ## Notes
 
- * Some controllers and MIDI apps send a [noteOn events with a velocity of 0][3] instead of noteOff events. But no worries, SMI automatically translates them to noteOff events.
+ * Some controllers and MIDI apps send a [noteOn events with a velocity of 0][3] instead of noteOff events. SMI automatically translates them to noteOff events.
  * Tested with MPK Mini, HotHand USB and half a dozen iOS apps with rtpMIDI / CoreMIDI.
  * Tested on both the Jazz-plugin polyfill and the MIDI API.
  * No Sysex support yet.

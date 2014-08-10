@@ -27,10 +27,10 @@ Options :
 
 Events :
 
- * listen : Occurs when the parameter starts listening for a MIDI event to be bound to. Receive the id as argument.
- * cancel : Occurs when the parameter stops listening for a MIDI event to be bound to. Receive the id as argument.
- * bind : Occurs when the parameter is bound to a MIDI event. Receive the id as argument.
- * unbind : Occurs when the parameter is unbound. Receive the id as argument.
+ * listen : Occurs when the parameter starts listening for a MIDI event to be bound to.
+ * cancel : Occurs when the parameter stops listening for a MIDI event to be bound to.
+ * bind : Occurs when the parameter is bound to a MIDI event.
+ * unbind : Occurs when the parameter is unbound.
  * change : Occurs when the parameter is modified through the bound midi events. Receive the id and the value as arguments.
 
 ### midiLearning.startListening()
