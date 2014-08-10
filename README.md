@@ -220,7 +220,7 @@ smi.trigger(null); //remove the current function
 
 ### 1.1.0 (2014/08/10) :
 
- * Add experimental MIDI learn capability ([doc]((https://github.com/kchapelier/SimpleMidiInput.js/blob/master/README-MIDILEARN.md))).
+ * Add experimental MIDI learn capability ([doc](https://github.com/kchapelier/SimpleMidiInput.js/blob/master/README-MIDILEARN.md)).
 
 ### 1.0.2 (2014/07/19) :
 

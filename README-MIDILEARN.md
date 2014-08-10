@@ -4,7 +4,7 @@ MIDI Learn is a simple system used by many DAW and plugins to simplify the use o
 For web apps, the main advantage is that the MIDI binding doesn't have to be hardcoded.
 The users can effectively bind the parameters to the events of their choice.
 
-Exemple in Pro Tools : https://www.youtube.com/watch?v=fExGqNi4j5o
+Example in Pro Tools : https://www.youtube.com/watch?v=fExGqNi4j5o
 
 SimpleMidiInput supports classic CC bindings as well as per-note velocity bindings
 (with support for aftertouch if the controller supports this feature).
@@ -45,7 +45,7 @@ Stop listening for MIDI events to bind the parameter to.
 
 Remove all the bindings of the parameter.
 
-# Exemple :
+# Example :
 
 ```html
 <input type="range" min="0" max="100" value="20" id="my-parameter" />
