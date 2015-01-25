@@ -1,6 +1,6 @@
 /*
  * SimpleMidiInput.js
- * v1.1.0
+ * v1.1.1
  * Author: Kevin Chapelier
  * License: MIT
  */
@@ -25,6 +25,86 @@
     var isArray = function (value) {
         return Object.prototype.toString.call(value) === '[object Array]';
     };
+
+    /**
+     * Returns whether a value is a MIDIInputMap
+     * @param {*} value
+     * @returns {boolean}
+     */
+    var isMIDIInputMap = function (value) {
+        return Object.prototype.toString.call(value) === '[object MIDIInputMap]';
+    };
+
+    /**
+     * Returns whether a value is a MIDIInput
+     * @param {*} value
+     * @returns {boolean}
+     */
+    var isMIDIInput = function (value) {
+        return Object.prototype.toString.call(value) === '[object MIDIInput]';
+    };
+
+    /**
+     * Returns whether a value is a MIDIAccess
+     * @param {*} value
+     * @returns {boolean}
+     */
+    var isMIDIAccess = function (value) {
+        return Object.prototype.toString.call(value) === '[object MIDIAccess]';
+    };
+
+    /**
+     * Returns whether a value is a function
+     * @param {*} value
+     * @returns {boolean}
+     */
+    var isFunction = function (value) {
+        return typeof value === 'function';
+    };
+
+    /**
+     * Returns whether a value is an iterator
+     * @param {*} value
+     * @returns {boolean}
+     */
+    var isIterator = function (value) {
+        return Object.prototype.toString.call(value) === '[object Iterator]';
+    };
+
+    /**
+     * Force whatever it receive to an array of MIDIInput when possible
+     * @param {Function|Iterator|MIDIAccess|MIDIInputMap|MIDIInput|MIDIInput[]} source
+     * @returns {MIDIInput[]} Array of MIDIInput
+     */
+    var normalizeInputs = function (source) {
+        var inputs = [],
+            input;
+
+        if(isMIDIInput(source)) {
+            inputs.push(source);
+        } else {
+            if(isMIDIAccess(source)) {
+                source = source.inputs;
+            }
+
+            if(isFunction(source)) {
+                source = source();
+            } else if(isMIDIInputMap(source)) {
+                source = source.values();
+            }
+
+            if(isArray(source)) {
+                inputs = source;
+            } else if(isIterator(source)) {
+                while (input = source.next().value) {
+                    inputs.push(input);
+                }
+            }
+        }
+
+        return inputs;
+    };
+
 
     /**
      * Convert Variable Length Quantity to integer
@@ -56,52 +136,66 @@
 
     /**
      * Attach this instance to one or several MIDIInput
-     * @param {MIDIInput|MIDIInput[]} midiInput
+     * @param {MIDIAccess|MIDIInputMap|MIDIInput|MIDIInput[]} midiInput
      * @returns {SimpleMidiInput} Instance for method chaining
      */
     SimpleMidiInput.prototype.attach = function(midiInput) {
-        if(isArray(midiInput)) {
-            for(var i = 0; i < midiInput.length; i++) {
-                this.attach(midiInput[i]);
-            }
-        } else {
-            if(!this.innerEventListeners[midiInput.id]) {
-                var listener = function (event) {
-                    this.processMidiMessage(event.data);
-                }.bind(this);
+        var inputs = normalizeInputs(midiInput);
 
-                midiInput.addEventListener("midimessage", listener);
-                this.innerEventListeners[midiInput.id] = {
-                    input: midiInput,
-                    listener: listener
-                };
-            }
+        for(var i = 0; i < inputs.length; i++) {
+            this.attachIndividual(inputs[i]);
         }
 
         return this;
     };
 
     /**
+     * Attach this instance to a given MIDIInput
+     * @private
+     * @param {MIDIInput} midiInput
+     */
+    SimpleMidiInput.prototype.attachIndividual = function(midiInput) {
+        if(!this.innerEventListeners[midiInput.id]) {
+            var listener = function (event) {
+                this.processMidiMessage(event.data);
+            }.bind(this);
+
+            midiInput.addEventListener("midimessage", listener);
+            this.innerEventListeners[midiInput.id] = {
+                input: midiInput,
+                listener: listener
+            };
+        }
+    };
+
+    /**
      * Detach this instance from one or several MIDIInput
-     * @param {MIDIInput|MIDIInput[]} midiInput
+     * @param {MIDIAccess|MIDIInputMap|MIDIInput|MIDIInput[]} midiInput
      * @returns {SimpleMidiInput} Instance for method chaining
      */
     SimpleMidiInput.prototype.detach = function(midiInput) {
-        if(isArray(midiInput)) {
-            for(var i = 0; i < midiInput.length; i++) {
-                this.detach(midiInput);
-            }
-        } else {
-            if(!!this.innerEventListeners[midiInput.id]) {
-                var listener = this.innerEventListeners[midiInput.id].listener;
-                midiInput = this.innerEventListeners[midiInput.id].input;
+        var inputs = normalizeInputs(midiInput);
 
-                midiInput.removeEventListener("midimessage", listener);
-                delete this.innerEventListeners[midiInput.id];
-            }
+        for(var i = 0; i < inputs.length; i++) {
+            this.detachIndividual(inputs[i]);
         }
 
         return this;
+    };
+
+    /**
+     * Detach this instance from a given MIDIInput
+     * @private
+     * @param {MIDIInput} midiInput
+     */
+    SimpleMidiInput.prototype.detachIndividual = function(midiInput) {
+        if(!!this.innerEventListeners[midiInput.id]) {
+            var listener = this.innerEventListeners[midiInput.id].listener;
+            midiInput = this.innerEventListeners[midiInput.id].input;
+
+            midiInput.removeEventListener("midimessage", listener);
+            delete this.innerEventListeners[midiInput.id];
+        }
     };
 
     /**
