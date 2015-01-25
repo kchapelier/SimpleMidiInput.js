@@ -10,9 +10,9 @@ Download the SimpleMidiInput.js file and include it in your html page.
 
 Or install it with bower using the following command: ```bower install SimpleMidiInput.js```
 
-To run the test suite, run the following command: ```npm test```
+To run the test suite, first install the dev dependencies with ```npm install```
 
-After installing the dev dependencies with ```npm install```
+Then run the following command: ```npm test```
 
 ## Usage
 
@@ -24,7 +24,7 @@ var smi = new SimpleMidiInput();
 navigator.requestMIDIAccess().then( onsuccesscallback, onerrorcallback );
 
 var onsuccesscallback = function(midi) {
-    smi.attach(midi.inputs());
+    smi.attach(midi);
 };
 
 var onerrorcallback = function(err) {
@@ -102,7 +102,7 @@ Instaciation of the class.
 
 Options :
 
- * midiInput : A single instance of MIDIInput or an array of MIDIInput
+ * midiInput : A single instance of MIDIInput, MIDIInputMap, MIDIInputAccess or an array of MIDIInput.
 
 ### smi.attach(midiInput);
 
@@ -110,7 +110,7 @@ Attach the instance to one or several MIDIInput.
 
 Options :
 
- * midiInput : A single instance of MIDIInput or an array of MIDIInput
+ * midiInput : A single instance of MIDIInput, MIDIInputMap, MIDIInputAccess or an array of MIDIInput.
 
 ### smi.detach(midiInput);
 
@@ -118,7 +118,7 @@ Detach the instance from one or several MIDIInput.
 
 Options :
 
-* midiInput : A single instance of MIDIInput or an array of MIDIInput
+* midiInput : A single instance of MIDIInput, MIDIInputMap, MIDIInputAccess or an array of MIDIInput.
 
 ### smi.detachAll();
 
@@ -217,6 +217,11 @@ smi.trigger(null); //remove the current function
  * global (catches everything)
 
 ## History
+
+### 1.1.1 (2015/01/25) :
+
+ * attach() and detach() now receive a instance of MIDIInputMap or MIDIAccess.
+ * Fix detach() not working correctly when used with an array.
 
 ### 1.1.0 (2014/08/10) :
 

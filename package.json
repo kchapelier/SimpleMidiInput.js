@@ -1,6 +1,6 @@
 {
   "name": "SimpleMidiInput.js",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Abstraction over the MIDI input. Does all the byte crunching and exposes a straightforward event API with MIDI learn capability.",
   "main": "src/SimpleMidiInput.js",
   "scripts": {
