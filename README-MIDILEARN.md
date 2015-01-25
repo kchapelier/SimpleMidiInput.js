@@ -115,8 +115,8 @@ input.addEventListener('change', function() {
 
 // attaching SMI to the MIDI inputs
 var onMIDIStarted = function(midi) {
-    console.log('onMIDIStarted', midi.inputs());
-    smi.attach(midi.inputs());
+    console.log('onMIDIStarted', midi);
+    smi.attach(midi);
 };
 
 var onMIDISystemError = function() {
