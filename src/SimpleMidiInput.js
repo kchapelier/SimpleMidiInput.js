@@ -80,22 +80,22 @@
         var inputs = [],
             input;
 
-        if(isMIDIInput(source)) {
+        if (isMIDIInput(source)) {
             inputs.push(source);
         } else {
-            if(isMIDIAccess(source)) {
+            if (isMIDIAccess(source)) {
                 source = source.inputs;
             }
 
-            if(isFunction(source)) {
+            if (isFunction(source)) {
                 source = source();
-            } else if(isMIDIInputMap(source)) {
+            } else if (isMIDIInputMap(source)) {
                 source = source.values();
             }
 
-            if(isArray(source)) {
+            if (isArray(source)) {
                 inputs = source;
-            } else if(isIterator(source)) {
+            } else if (isIterator(source)) {
                 while (input = source.next().value) {
                     inputs.push(input);
                 }
@@ -105,14 +105,13 @@
         return inputs;
     };
 
-
     /**
      * Convert Variable Length Quantity to integer
      * @param {int} first LSB
      * @param {int} second MSB
      * @returns {int} Standard integer
      */
-    var readVLQ = function(first, second) {
+    var readVLQ = function (first, second) {
         return (second << 7) + (first & 0x7F);
     };
 
@@ -125,7 +124,7 @@
         this.events = {};
         this.innerEventListeners = {};
 
-        if(midiInput) {
+        if (midiInput) {
             this.attach(midiInput);
         }
     };
@@ -139,10 +138,10 @@
      * @param {MIDIAccess|MIDIInputMap|MIDIInput|MIDIInput[]} midiInput
      * @returns {SimpleMidiInput} Instance for method chaining
      */
-    SimpleMidiInput.prototype.attach = function(midiInput) {
+    SimpleMidiInput.prototype.attach = function (midiInput) {
         var inputs = normalizeInputs(midiInput);
 
-        for(var i = 0; i < inputs.length; i++) {
+        for (var i = 0; i < inputs.length; i++) {
             this.attachIndividual(inputs[i]);
         }
 
@@ -154,11 +153,12 @@
      * @private
      * @param {MIDIInput} midiInput
      */
-    SimpleMidiInput.prototype.attachIndividual = function(midiInput) {
-        if(!this.innerEventListeners[midiInput.id]) {
-            var listener = function (event) {
-                this.processMidiMessage(event.data);
-            }.bind(this);
+    SimpleMidiInput.prototype.attachIndividual = function (midiInput) {
+        if (!this.innerEventListeners[midiInput.id]) {
+            var self = this,
+                listener = function (event) {
+                    self.processMidiMessage(event.data);
+                };
 
             midiInput.addEventListener("midimessage", listener);
             this.innerEventListeners[midiInput.id] = {
@@ -173,10 +173,10 @@
      * @param {MIDIAccess|MIDIInputMap|MIDIInput|MIDIInput[]} midiInput
      * @returns {SimpleMidiInput} Instance for method chaining
      */
-    SimpleMidiInput.prototype.detach = function(midiInput) {
+    SimpleMidiInput.prototype.detach = function (midiInput) {
         var inputs = normalizeInputs(midiInput);
 
-        for(var i = 0; i < inputs.length; i++) {
+        for (var i = 0; i < inputs.length; i++) {
             this.detachIndividual(inputs[i]);
         }
 
@@ -188,8 +188,8 @@
      * @private
      * @param {MIDIInput} midiInput
      */
-    SimpleMidiInput.prototype.detachIndividual = function(midiInput) {
-        if(!!this.innerEventListeners[midiInput.id]) {
+    SimpleMidiInput.prototype.detachIndividual = function (midiInput) {
+        if (!!this.innerEventListeners[midiInput.id]) {
             var listener = this.innerEventListeners[midiInput.id].listener;
             midiInput = this.innerEventListeners[midiInput.id].input;
 
@@ -202,9 +202,9 @@
      * Detach this instance from everything
      * @returns {SimpleMidiInput} Instance for method chaining
      */
-    SimpleMidiInput.prototype.detachAll = function() {
-        for(var id in this.innerEventListeners) {
-            if(this.innerEventListeners.hasOwnProperty(id)) {
+    SimpleMidiInput.prototype.detachAll = function () {
+        for (var id in this.innerEventListeners) {
+            if (this.innerEventListeners.hasOwnProperty(id)) {
                 var midiInput = this.innerEventListeners[midiInput.id].input;
                 var listener = this.innerEventListeners[midiInput.id].listener;
 
@@ -223,141 +223,141 @@
      * @param {UInt8Array} data - Midi mesage data
      * @returns {Object} Midi event, as a readable object
      */
-    SimpleMidiInput.prototype.parseMidiMessage = function(data) {
+    SimpleMidiInput.prototype.parseMidiMessage = function (data) {
         var event;
 
-        switch(data[0]) {
+        switch (data[0]) {
             case 0x00:
                 //some iOS app are sending a massive amount of seemingly empty messages, ignore them
                 return null;
             case 0xF2:
                 event = {
-                    'event': 'songPosition',
-                    'position': readVLQ(data[1], data[2]),
-                    'data': data
+                    event: 'songPosition',
+                    position: readVLQ(data[1], data[2]),
+                    data: data
                 };
                 break;
             case 0xF3:
                 event = {
-                    'event': 'songSelect',
-                    'song': data[1],
-                    'data': data
+                    event: 'songSelect',
+                    song: data[1],
+                    data: data
                 };
                 break;
             case 0xF6:
                 event = {
-                    'event': 'tuneRequest',
-                    'data': data
+                    event: 'tuneRequest',
+                    data: data
                 };
                 break;
             case 0xF8:
                 event = {
-                    'event': 'clock',
-                    'command': 'clock',
-                    'data': data
+                    event: 'clock',
+                    command: 'clock',
+                    data: data
                 };
                 break;
             case 0xFA:
                 event = {
-                    'event': 'clock',
-                    'command': 'start',
-                    'data': data
+                    event: 'clock',
+                    command: 'start',
+                    data: data
                 };
                 break;
             case 0xFB:
                 event = {
-                    'event': 'clock',
-                    'command': 'continue',
-                    'data': data
+                    event: 'clock',
+                    command: 'continue',
+                    data: data
                 };
                 break;
             case 0xFC:
                 event = {
-                    'event': 'clock',
-                    'command': 'stop',
-                    'data': data
+                    event: 'clock',
+                    command: 'stop',
+                    data: data
                 };
                 break;
             case 0xFE:
                 event = {
-                    'event': 'activeSensing',
-                    'data': data
+                    event: 'activeSensing',
+                    data: data
                 };
                 break;
             case 0xFF:
                 event = {
-                    'event': 'reset',
-                    'data': data
+                    event: 'reset',
+                    data: data
                 };
                 break;
         }
 
         if (data[0] >= 0xE0 && data[0] < 0xF0) {
             event = {
-                'event': 'pitchWheel',
-                'channel': 1 + data[0] - 0xE0,
-                'value': readVLQ(data[1], data[2]) - 0x2000,
-                'data': data
+                event: 'pitchWheel',
+                channel: 1 + data[0] - 0xE0,
+                value: readVLQ(data[1], data[2]) - 0x2000,
+                data: data
             };
         } else if (data[0] >= 0xD0 && data[0] < 0xE0) {
             event = {
-                'event': 'channelAftertouch',
-                'channel': 1 + data[0] - 0xD0,
-                'pressure': data[1],
-                'data': data
+                event: 'channelAftertouch',
+                channel: 1 + data[0] - 0xD0,
+                pressure: data[1],
+                data: data
             };
         } else if (data[0] >= 0xC0 && data[0] < 0xD0) {
             event = {
-                'event': 'programChange',
-                'channel': 1 + data[0] - 0xC0,
-                'program': data[1],
-                'data': data
+                event: 'programChange',
+                channel: 1 + data[0] - 0xC0,
+                program: data[1],
+                data: data
             };
         } else if (data[0] >= 0xB0 && data[0] < 0xC0) {
             event = {
-                'event': 'cc',
-                'channel': 1 + data[0] - 0xB0,
-                'cc': data[1],
-                'value': data[2],
-                'data': data
+                event: 'cc',
+                channel: 1 + data[0] - 0xB0,
+                cc: data[1],
+                value: data[2],
+                data: data
             };
         } else if (data[0] >= 0xA0 && data[0] < 0xB0) {
             event = {
-                'event': 'polyphonicAftertouch',
-                'channel': 1 + data[0] - 0xA0,
-                'key': data[1],
-                'pressure': data[2],
-                'data': data
+                event: 'polyphonicAftertouch',
+                channel: 1 + data[0] - 0xA0,
+                key: data[1],
+                pressure: data[2],
+                data: data
             };
         } else if (data[0] >= 0x90 && data[0] < 0xA0) {
             event = {
-                'event': 'noteOn',
-                'channel': 1 + data[0] - 0x90,
-                'key': data[1],
-                'velocity': data[2],
-                'data': data
+                event: 'noteOn',
+                channel: 1 + data[0] - 0x90,
+                key: data[1],
+                velocity: data[2],
+                data: data
             };
 
             //abstracting the fact that a noteOn with a velocity of 0 is supposed to be equal to a noteOff message
-            if(event.velocity === 0) {
+            if (event.velocity === 0) {
                 event.velocity = 127;
                 event.event = 'noteOff';
             }
 
         } else if (data[0] >= 0x80 && data[0] < 0x90) {
             event = {
-                'event': 'noteOff',
-                'channel': 1 + data[0] - 0x80,
-                'key': data[1],
-                'velocity': data[2],
-                'data': data
+                event: 'noteOff',
+                channel: 1 + data[0] - 0x80,
+                key: data[1],
+                velocity: data[2],
+                data: data
             };
         }
 
-        if(!event) {
+        if (!event) {
             event = {
-                'event': 'unknown',
-                'data': data
+                event: 'unknown',
+                data: data
             };
         }
 
@@ -373,19 +373,19 @@
     SimpleMidiInput.prototype.processMidiMessage = function (data) {
         var event = this.parseMidiMessage(data);
 
-        if(event) {
+        if (event) {
             if (this.filter) {
                 if (this.filter(event) === false) {
                     return this;
                 }
             }
 
-            if (!!event['cc']) {
+            if (!!event.cc) {
                 this.trigger(event.event + event.cc, event);
                 this.trigger(event.channel + '.' + event.event + event.cc, event);
             } else {
                 this.trigger(event.event, event);
-                if (!!event['channel']) {
+                if (!!event.channel) {
                     this.trigger(event.channel + '.' + event.event, event);
                 }
             }
@@ -402,7 +402,7 @@
      * @returns {SimpleMidiInput} Instance for method chaining
      */
     SimpleMidiInput.prototype.setFilter = function (filter) {
-        if(typeof filter === 'function') {
+        if (isFunction(filter)) {
             this.filter = filter;
         } else {
             delete this.filter;
@@ -419,7 +419,7 @@
      * @returns {SimpleMidiInput} Instance for method chaining
      */
     SimpleMidiInput.prototype.on = function (event, channel, func) {
-        if (typeof(channel) === 'function') {
+        if (isFunction(channel)) {
             func = channel;
         } else if (isNumeric(channel)) {
             event = channel + '.' + event;
@@ -442,7 +442,7 @@
      * @returns {SimpleMidiInput} Instance for method chaining
      */
     SimpleMidiInput.prototype.off = function (event, channel, func) {
-        if (typeof(channel) === 'function') {
+        if (isFunction(channel)) {
             func = channel;
         } else if (isNumeric(channel)) {
             event = channel + '.' + event;
@@ -481,8 +481,8 @@
      * @private
      * @returns {MidiLearn} Instance of MidiLearn
      */
-    SimpleMidiInput.prototype.getMidiLearnInstance = function() {
-        if(!this.midiLearn) {
+    SimpleMidiInput.prototype.getMidiLearnInstance = function () {
+        if (!this.midiLearn) {
             this.midiLearn = new MidiLearn(this);
         }
 
@@ -494,19 +494,19 @@
      * @param {Object} options - Options of the parameter (id, min, max, value, events)
      * @returns {MidiLearning}
      */
-    SimpleMidiInput.prototype.getMidiLearning = function(options) {
+    SimpleMidiInput.prototype.getMidiLearning = function (options) {
         return this.getMidiLearnInstance().getMidiLearning(options);
     };
 
     /****** MidiLearn.js ******/
 
-    var scale = function scale(value, min, max, dstMin, dstMax) {
+    var scale = function scale (value, min, max, dstMin, dstMax) {
         value = (max === min ? 0 : (Math.max(min, Math.min(max, value)) / (max - min)));
 
         return value * (dstMax - dstMin) + dstMin;
     };
 
-    var limit = function limit(value, min, max) {
+    var limit = function limit (value, min, max) {
         return Math.max(min, Math.min(max, value));
     };
 
@@ -514,11 +514,13 @@
      * Generate a random id
      * @returns {Number}
      */
-    var generateRandomId = function() {
+    var generateRandomId = function () {
         return (new Date()).getTime() + Math.floor(Math.random() * 1000000);
     };
 
-    var MidiLearning = function(midiLearn, options) {
+    var MidiLearning = function (midiLearn, options) {
+        var noop = function () {};
+
         this.midiLearn = midiLearn;
 
         this.id = options.id || generateRandomId();
@@ -528,11 +530,11 @@
         this.activeCallbacks = {};
 
         this.events = {
-            change : options.events.change || function() {},
-            bind : options.events.bind || function() {},
-            unbind : options.events.unbind || function() {},
-            cancel : options.events.cancel || function() {},
-            listen : options.events.listen || function() {}
+            change: options.events.change || noop,
+            bind: options.events.bind || noop,
+            unbind: options.events.unbind || noop,
+            cancel: options.events.cancel || noop,
+            listen: options.events.listen || noop
         };
 
         this.setValue(limit(parseFloat(options.value || 0), this.min, this.max));
@@ -546,36 +548,36 @@
     MidiLearning.prototype.activeCallbacks = null;
     MidiLearning.prototype.events = null;
 
-    MidiLearning.prototype.unbind = function() {
+    MidiLearning.prototype.unbind = function () {
         this.midiLearn.removeBinding(this);
     };
 
-    MidiLearning.prototype.startListening = function() {
+    MidiLearning.prototype.startListening = function () {
         this.midiLearn.startListeningForBinding(this);
     };
 
-    MidiLearning.prototype.stopListening = function() {
+    MidiLearning.prototype.stopListening = function () {
         this.midiLearn.startListeningForBinding(this);
     };
 
-    MidiLearning.prototype.setValue = function(event, property) {
+    MidiLearning.prototype.setValue = function (event, property) {
         var value;
 
-        if(event && property) {
+        if (event && property) {
             value = scale(event[property], 0, 127, this.min, this.max);
-        } else if(typeof event === 'number') {
+        } else if (typeof event === 'number') {
             value = event;
         } else {
             value = this.min;
         }
 
-        if(value !== this.value) {
+        if (value !== this.value) {
             this.value = value;
             this.events.change(this.id, value);
         }
     };
 
-    var MidiLearn = function(smi) {
+    var MidiLearn = function (smi) {
         this.smi = smi;
         this.bindings = {};
     };
@@ -584,12 +586,12 @@
     MidiLearn.prototype.currentMidiLearning = null;
     MidiLearn.prototype.bindings = null;
 
-    MidiLearn.prototype.getMidiLearning = function(options) {
+    MidiLearn.prototype.getMidiLearning = function (options) {
         return new MidiLearning(this, options);
     };
 
-    MidiLearn.prototype.listenerForBinding = function(event) {
-        if(this.currentMidiLearning && event) {
+    MidiLearn.prototype.listenerForBinding = function (event) {
+        if (this.currentMidiLearning && event) {
             var midiLearning = this.currentMidiLearning;
 
             midiLearning.events.bind(event);
@@ -600,7 +602,7 @@
         }
     };
 
-    MidiLearn.prototype.startListeningForBinding = function(midiLearning) {
+    MidiLearn.prototype.startListeningForBinding = function (midiLearning) {
         this.stopListeningForBinding();
         this.currentMidiLearning = midiLearning;
 
@@ -611,25 +613,25 @@
         this.smi.on('global', midiLearning.listener);
     };
 
-    MidiLearn.prototype.stopListeningForBinding = function(midiLearning) {
-        if(this.currentMidiLearning !== null && (!midiLearning || this.currentMidiLearning === midiLearning)) {
+    MidiLearn.prototype.stopListeningForBinding = function (midiLearning) {
+        if (this.currentMidiLearning !== null && (!midiLearning || this.currentMidiLearning === midiLearning)) {
             this.smi.off('global', this.currentMidiLearning.listener);
             this.currentMidiLearning.events.cancel();
             this.currentMidiLearning = null;
         }
     };
 
-    MidiLearn.prototype.setCallback = function(midiLearning, eventName, func) {
+    MidiLearn.prototype.setCallback = function (midiLearning, eventName, func) {
         midiLearning.activeCallbacks[eventName] = func;
         this.smi.on(eventName, midiLearning.channel, func);
     };
 
-    MidiLearn.prototype.removeBinding = function(midiLearning) {
-        if(midiLearning && midiLearning.activeCallbacks) {
+    MidiLearn.prototype.removeBinding = function (midiLearning) {
+        if (midiLearning && midiLearning.activeCallbacks) {
             var callbacks = midiLearning.activeCallbacks;
 
-            for(var key in callbacks) {
-                if(callbacks.hasOwnProperty(key)) {
+            for (var key in callbacks) {
+                if (callbacks.hasOwnProperty(key)) {
                     this.smi.off(key, midiLearning.channel, callbacks[key]);
                 }
             }
@@ -640,53 +642,53 @@
         delete this.bindings[midiLearning.id];
     };
 
-    MidiLearn.prototype.addBinding = function(midiLearning, event) {
+    MidiLearn.prototype.addBinding = function (midiLearning, event) {
         this.removeBinding(midiLearning);
 
         this.bindings[midiLearning.id] = midiLearning;
 
-        if(event.event === 'cc') {
+        if (event.event === 'cc') {
             this.addCCBinding(midiLearning, event);
-        } else if(event.event === 'noteOn') {
+        } else if (event.event === 'noteOn') {
             this.addNoteBinding(midiLearning, event);
         }
     };
 
-    MidiLearn.prototype.addNoteBinding = function(midiLearning, event) {
+    MidiLearn.prototype.addNoteBinding = function (midiLearning, event) {
         midiLearning.channel = event.channel;
 
-        this.setCallback(midiLearning, 'noteOn', function(e) {
-            if(e.key === event.key) {
+        this.setCallback(midiLearning, 'noteOn', function (e) {
+            if (e.key === event.key) {
                 midiLearning.setValue(e, 'velocity');
             }
         });
 
-        this.setCallback(midiLearning, 'noteOff', function(e) {
-            if(e.key === event.key) {
+        this.setCallback(midiLearning, 'noteOff', function (e) {
+            if (e.key === event.key) {
                 midiLearning.setValue();
             }
         });
 
-        this.setCallback(midiLearning, 'polyphonicAftertouch', function(e) {
-            if(e.key === event.key) {
+        this.setCallback(midiLearning, 'polyphonicAftertouch', function (e) {
+            if (e.key === event.key) {
                 midiLearning.setValue(e, 'pressure');
             }
         });
     };
 
-    MidiLearn.prototype.addCCBinding = function(midiLearning, event) {
+    MidiLearn.prototype.addCCBinding = function (midiLearning, event) {
         midiLearning.channel = event.channel;
 
-        this.setCallback(midiLearning, 'cc' + event.cc, function(e) {
+        this.setCallback(midiLearning, 'cc' + event.cc, function (e) {
             midiLearning.setValue(e, 'value');
         });
     };
 
     if (typeof define === 'function' && define.amd) {
-        define(function() {
+        define(function () {
             return SimpleMidiInput;
         });
-    } else if(typeof module === 'object') {
+    } else if (typeof module === 'object') {
         module.exports = SimpleMidiInput;
     } else if (typeof window === "object" && typeof window.document === "object") {
         window.SimpleMidiInput = SimpleMidiInput;

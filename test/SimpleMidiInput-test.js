@@ -1,11 +1,12 @@
 "use strict";
 
-require('chai').should();
 var SimpleMidiInput = require('../src/SimpleMidiInput.js');
 
-describe('SimpleMidiInput', function() {
-    describe('#treatEvent()', function() {
-        it('supports noteOff events', function() {
+require('chai').should();
+
+describe('SimpleMidiInput', function () {
+    describe('#treatEvent()', function () {
+        it('supports noteOff events', function () {
             var event,
                 smi = new SimpleMidiInput();
 
@@ -28,7 +29,7 @@ describe('SimpleMidiInput', function() {
             event.velocity.should.equal(1);
         });
 
-        it('supports noteOn events', function() {
+        it('supports noteOn events', function () {
             var event,
                 smi = new SimpleMidiInput();
 
@@ -51,7 +52,7 @@ describe('SimpleMidiInput', function() {
             event.velocity.should.equal(1);
         });
 
-        it('supports noteOn with velocity 0 as noteOff', function() {
+        it('supports noteOn with velocity 0 as noteOff', function () {
             var event,
                 smi = new SimpleMidiInput();
 
@@ -73,11 +74,11 @@ describe('SimpleMidiInput', function() {
             event.key.should.equal(127);
             event.velocity.should.equal(127);
         });
-        
-        it('supports polyphonicAftertouch events', function() {
+
+        it('supports polyphonicAftertouch events', function () {
             var event,
                 smi = new SimpleMidiInput();
-            
+
             event = smi.parseMidiMessage([0xA0, 0x40, 0x7F]);
             event.event.should.equal('polyphonicAftertouch');
             event.channel.should.equal(1);
@@ -97,7 +98,7 @@ describe('SimpleMidiInput', function() {
             event.pressure.should.equal(0);
         });
 
-        it('supports cc events', function() {
+        it('supports cc events', function () {
             var event,
                 smi = new SimpleMidiInput();
 
@@ -120,7 +121,7 @@ describe('SimpleMidiInput', function() {
             event.value.should.equal(0);
         });
 
-        it('supports programChange events', function() {
+        it('supports programChange events', function () {
             var event,
                 smi = new SimpleMidiInput();
 
@@ -139,8 +140,8 @@ describe('SimpleMidiInput', function() {
             event.channel.should.equal(16);
             event.program.should.equal(127);
         });
-        
-        it('supports channelAftertouch events', function() {
+
+        it('supports channelAftertouch events', function () {
             var event,
                 smi = new SimpleMidiInput();
 
@@ -160,7 +161,7 @@ describe('SimpleMidiInput', function() {
             event.pressure.should.equal(127);
         });
 
-        it('supports pitchWheel events', function() {
+        it('supports pitchWheel events', function () {
             var event,
                 smi = new SimpleMidiInput();
 
@@ -180,14 +181,14 @@ describe('SimpleMidiInput', function() {
             event.value.should.equal(0);
         });
 
-        it('supports clocks events', function() {
+        it('supports clocks events', function () {
             var event,
                 smi = new SimpleMidiInput();
 
             event = smi.parseMidiMessage([0xF8]);
             event.event.should.equal('clock');
             event.command.should.equal('clock');
-            
+
             event = smi.parseMidiMessage([0xFA]);
             event.event.should.equal('clock');
             event.command.should.equal('start');
@@ -195,13 +196,13 @@ describe('SimpleMidiInput', function() {
             event = smi.parseMidiMessage([0xFB]);
             event.event.should.equal('clock');
             event.command.should.equal('continue');
-            
+
             event = smi.parseMidiMessage([0xFC]);
             event.event.should.equal('clock');
             event.command.should.equal('stop');
         });
 
-        it('supports other 0xF* events', function() {
+        it('supports other 0xF* events', function () {
             var event,
                 smi = new SimpleMidiInput();
 
