@@ -1,0 +1,20 @@
+{
+  "browserify": true,
+  "esnext": false,
+  "eqeqeq": true,
+  "forin": true,
+  "camelcase": true,
+  "curly": true,
+  "immed": true,
+  "newcap": false,
+  "noarg": true,
+  "undef": true,
+  "unused": "vars",
+  "strict": true,
+  "nonbsp": true,
+  "freeze": true,
+  "maxparams": 5,
+  "maxdepth": 3,
+  "maxcomplexity": 6,
+  "maxstatements": 20
+}
