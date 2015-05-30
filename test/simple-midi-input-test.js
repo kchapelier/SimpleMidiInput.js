@@ -1,8 +1,7 @@
 "use strict";
 
-var SimpleMidiInput = require('../src/SimpleMidiInput.js');
-
-require('chai').should();
+var SimpleMidiInput = require('../src/simple-midi-input'),
+    should = require('chai').should();
 
 describe('SimpleMidiInput', function () {
     describe('#treatEvent()', function () {
