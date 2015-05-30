@@ -1,10 +1,12 @@
 {
-  "name": "SimpleMidiInput.js",
-  "version": "1.1.1",
+  "name": "simple-midi-input",
+  "version": "1.2.0",
   "description": "Abstraction over the MIDI input. Does all the byte crunching and exposes a straightforward event API with MIDI learn capability.",
-  "main": "src/SimpleMidiInput.js",
+  "main": "index.js",
   "scripts": {
-    "test": "mocha test/"
+    "test": "gulp test",
+    "build": "browserify index.js -d --s SimpleMidiInput -u crypto > build/SimpleMidiInput.js",
+    "watch": "watchify index.js --s SimpleMidiInput -u crypto -o build/SimpleMidiInput.js -v"
   },
   "repository": {
     "type": "git",
@@ -16,7 +18,6 @@
     "url": "https://github.com/kchapelier/SimpleMidiInput.js/issues"
   },
   "homepage": "https://github.com/kchapelier/SimpleMidiInput.js",
-  "private": true,
   "devDependencies": {
     "gulp": "^3.8.0",
     "gulp-jscs": "^1.3.0",

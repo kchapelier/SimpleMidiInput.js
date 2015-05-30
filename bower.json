@@ -1,12 +1,12 @@
 {
   "name": "SimpleMidiInput.js",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "homepage": "https://github.com/kchapelier/SimpleMidiInput.js",
   "authors": [
     "Kevin Chapelier"
   ],
   "description": "Abstraction over the MIDI input. Does all the byte crunching and exposes a straightforward event API with MIDI learn capability.",
-  "main": "src/SimpleMidiInput.js",
+  "main": "build/SimpleMidiInput.js",
   "moduleType": [
     "globals",
     "amd"
@@ -18,6 +18,7 @@
   ],
   "license": "MIT",
   "ignore": [
+    "src",
     "**/.*",
     "node_modules",
     "bower_components",

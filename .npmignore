@@ -1,0 +1,15 @@
+# Logs
+logs
+*.log
+
+.idea
+node_modules
+report
+
+#
+build/
+.editorconfig
+.jscsrc
+.jshintrc
+.travis.yml
+.gitignore

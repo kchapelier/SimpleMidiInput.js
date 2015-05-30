@@ -6,21 +6,20 @@ Abstraction over the MIDI input. Does all the byte crunching and exposes a strai
 
 ## Installing and testing
 
-Download the SimpleMidiInput.js file and include it in your html page.
+With npm do ```npm install simple-midi-input```.
+
+Or download the build/SimpleMidiInput.js file and include it in your html page.
 
 Or install it with bower using the following command: ```bower install SimpleMidiInput.js```
 
-To run the test suite, first install the dev dependencies with ```npm install```
-
-Then run the following command: ```npm test```
+To run the test suite clone the repository, install the dev dependencies with ```npm install``` and then run the following command: ```npm test```
 
 ## Usage
 
-Either include the [Jazz-plugin polyfill][1] and instanciate it or run chrome on mac with the Web MIDI API enabled in
-chrome://flags, then get the desired midi input.
-
 ```js
-var smi = new SimpleMidiInput();
+var SimpleMidiInput = require('simple-midi-input'),
+    smi = new SimpleMidiInput();
+
 navigator.requestMIDIAccess().then( onsuccesscallback, onerrorcallback );
 
 var onsuccesscallback = function(midi) {
@@ -62,7 +61,7 @@ smi.on('cc7', 1, function(data) {
 });
 ```
 
-Here we catch the control change #7 (which is [commonly][2] used to set the volume) on the first channel.
+Here we catch the control change #7 (which is [commonly][1] used to set the volume) on the first channel.
 
 ```js
 smi.on('polyphonicAftertouch', 1, function(data) {
@@ -175,6 +174,16 @@ Options :
  * event : Name of the event to listen to (ie: noteOn, noteOff, ...)
  * args : Arguments to pass to the handler function
 
+Example :
+
+```js
+smi.trigger('noteOff', {
+    channel: 1,
+    key: 69,
+    velocity: 127
+});
+```
+
 ### smi.setFilter(filter);
 
 Set a function to filter the midi event, the function will get the event as argument and must return false to filter it out.
@@ -187,7 +196,7 @@ Options :
 Example :
 
 ```js
-smi.trigger(function(event) {
+smi.setFilter(function(event) {
     // we don't want any of the noteOn / noteOff events for notes above E4
     if((event.event === 'noteOn' || event.event === 'noteOff') && event.key > 64) {
         return false;
@@ -196,7 +205,7 @@ smi.trigger(function(event) {
 ```
 
 ```js
-smi.trigger(null); //remove the current function
+smi.setFilter(null); //remove the current function
 ```
 
 ### Event names with their relative values
@@ -217,6 +226,13 @@ smi.trigger(null); //remove the current function
  * global (catches everything)
 
 ## History
+
+### 1.2.0 (2015/05/30) :
+
+ * Fix an issue where the midi events were not handled in latest Chrome.
+ * Fix error in doc for `setFilter`.
+ * Refactor to CommonJs and publish on npm as ```simple-midi-input```.
+ * Provide a browserified bundle for bower.
 
 ### 1.1.1 (2015/01/25) :
 
@@ -249,11 +265,9 @@ smi.trigger(null); //remove the current function
 
 ## Notes
 
- * Some controllers and MIDI apps send a [noteOn events with a velocity of 0][3] instead of noteOff events. SMI automatically translates them to noteOff events.
+ * Some controllers and MIDI apps send a [noteOn events with a velocity of 0][2] instead of noteOff events. SMI automatically translates them to noteOff events.
  * Tested with MPK Mini, HotHand USB and half a dozen iOS apps with rtpMIDI / CoreMIDI.
- * Tested on both the Jazz-plugin polyfill and the MIDI API.
  * No Sysex support yet.
 
-  [1]: http://cwilso.github.io/WebMIDIAPIShim/
-  [2]: http://www.midi.org/techspecs/midimessages.php#3
-  [3]: http://www.kvraudio.com/forum/viewtopic.php?p=4167096&sid=e8775321f4b8b6e174ec49b0d06667e8#p4167096
+  [1]: http://www.midi.org/techspecs/midimessages.php#3
+  [2]: http://www.kvraudio.com/forum/viewtopic.php?p=4167096&sid=e8775321f4b8b6e174ec49b0d06667e8#p4167096
