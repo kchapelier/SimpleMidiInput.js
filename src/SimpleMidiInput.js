@@ -154,13 +154,24 @@
      * @param {MIDIInput} midiInput
      */
     SimpleMidiInput.prototype.attachIndividual = function (midiInput) {
-        if (!this.innerEventListeners[midiInput.id]) {
-            var self = this,
+        if(!this.innerEventListeners[midiInput.id]) {
+            var originalListener = midiInput.onmidimessage,
+                listener,
+                self = this;
+
+            if (typeof originalListener === 'function') {
+                listener = function (event) {
+                    originalListener(event);
+                    self.processMidiMessage(event.data);
+                };
+            } else {
                 listener = function (event) {
                     self.processMidiMessage(event.data);
                 };
+            }
 
-            midiInput.addEventListener("midimessage", listener);
+            midiInput.onmidimessage = listener;
+
             this.innerEventListeners[midiInput.id] = {
                 input: midiInput,
                 listener: listener
