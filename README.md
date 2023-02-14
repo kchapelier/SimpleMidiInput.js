@@ -10,8 +10,6 @@ With npm do ```npm install simple-midi-input```.
 
 Or download the build/SimpleMidiInput.js file and include it in your html page.
 
-Or install it with bower using the following command: ```bower install SimpleMidiInput.js```
-
 To run the test suite clone the repository, install the dev dependencies with ```npm install``` and then run the following command: ```npm test```
 
 ## Usage
@@ -226,6 +224,12 @@ smi.setFilter(null); //remove the current function
  * global (catches everything)
 
 ## History
+
+### 1.2.1 (2023/02/15) :
+
+ * Update the detection of iterator which caused an issue when initialising SMI on current browsers.
+ * Remove any mention of bower.
+ * General dev deps cleaning.
 
 ### 1.2.0 (2015/05/30) :
 

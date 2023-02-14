@@ -1,7 +1,6 @@
 "use strict";
 
 var gulp = require('gulp'),
-    jscs = require('gulp-jscs'),
     jshint = require('gulp-jshint'),
     stylish = require('jshint-stylish'),
     mocha = require('gulp-mocha');
@@ -13,12 +12,6 @@ gulp.task('lint', function () {
         .src(files)
         .pipe(jshint('.jshintrc'))
         .pipe(jshint.reporter(stylish));
-});
-
-gulp.task('codestyle', function () {
-    return gulp
-        .src(files)
-        .pipe(jscs());
 });
 
 gulp.task('test', function () {

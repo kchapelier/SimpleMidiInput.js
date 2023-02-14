@@ -1,5 +1,10 @@
 "use strict";
 
+// TOUPDATE get rid of gulp altogether
+// TOUPDATE const, let
+// TOUPDATE use more modern js
+// TOUPDATE do away with the var XX = function ...
+
 var MidiLearn = require('./midi-learn');
 
 /**
@@ -17,6 +22,7 @@ var isNumeric = function (value) {
  * @returns {boolean}
  */
 var isArray = function (value) {
+    // TOUPDATE use Array.isArray
     return Object.prototype.toString.call(value) === '[object Array]';
 };
 
@@ -62,7 +68,9 @@ var isFunction = function (value) {
  * @returns {boolean}
  */
 var isIterator = function (value) {
-    return Object.prototype.toString.call(value) === '[object Iterator]';
+    // TOUPDATE use better way to check for iterator, without regex
+    var objectString = Object.prototype.toString.call(value);
+    return objectString === '[object Iterator]' || !!objectString.match(/^\[object( | [^ ]+ )Iterator\]$/);
 };
 
 /**
@@ -90,6 +98,7 @@ var normalizeInputs = function (source) {
         if (isArray(source)) {
             inputs = source;
         } else if (isIterator(source)) {
+            // TOUPDATE use Array.from()
             while (input = source.next().value) {
                 inputs.push(input);
             }
